@@ -11,12 +11,19 @@ with the reasoning and a risk plan attached.
 
 ---
 
-## Quick start (5 minutes, no broker account needed)
+## Quick start
+
+**Not technical? Read [START_HERE.md](START_HERE.md)** — install Python,
+double-click `START_DASHBOARD.bat` (Windows) or `START_DASHBOARD.command`
+(Mac), and everything else (including Fyers login) happens inside the
+dashboard's sidebar.
+
+Terminal users:
 
 ```bash
 pip install -r requirements.txt
-cp config.yaml.example config.yaml       # edit later; defaults work
-streamlit run dashboard/app.py
+streamlit run dashboard/app.py           # config.yaml is created from the UI,
+                                         # or copy config.yaml.example yourself
 ```
 
 Open http://localhost:8501 — you'll be in **Replay mode**: a simulated

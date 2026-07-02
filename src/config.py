@@ -45,6 +45,25 @@ def load_config() -> dict:
     return cfg
 
 
+def save_credentials(app_id: str, secret_key: str) -> None:
+    """Write Fyers keys into config.yaml (local file, gitignored)."""
+    cfg = {}
+    src = CONFIG_PATH if CONFIG_PATH.exists() else EXAMPLE_PATH
+    if src.exists():
+        with open(src) as f:
+            cfg = yaml.safe_load(f) or {}
+    cfg.setdefault("fyers", {})
+    cfg["fyers"]["app_id"] = app_id
+    cfg["fyers"]["secret_key"] = secret_key
+    cfg["fyers"].setdefault("redirect_url", "https://127.0.0.1")
+    with open(CONFIG_PATH, "w") as f:
+        yaml.safe_dump(cfg, f, sort_keys=False, allow_unicode=True)
+    try:
+        CONFIG_PATH.chmod(0o600)
+    except OSError:
+        pass
+
+
 def has_fyers_credentials(cfg: dict | None = None) -> bool:
     cfg = cfg or load_config()
     app_id = cfg["fyers"].get("app_id", "")

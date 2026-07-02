@@ -32,7 +32,7 @@ from dashboard.style import CSS, badge
 from dashboard import tv_widget
 
 st.set_page_config(page_title="NSE Intraday Assistant", page_icon="📈",
-                   layout="wide", initial_sidebar_state="collapsed")
+                   layout="wide", initial_sidebar_state="expanded")
 st.markdown(CSS, unsafe_allow_html=True)
 
 DISCLAIMER = ("⚠️ Educational decision-support tool. Signals measure indicator "
@@ -46,7 +46,9 @@ DISCLAIMER = ("⚠️ Educational decision-support tool. Signals measure indicat
 # Engine + feed boot (singleton across reruns)
 # ----------------------------------------------------------------------------
 @st.cache_resource
-def boot(mode: str):
+def boot(mode: str, _token_ok: bool = False):
+    # _token_ok is part of the cache key: connecting to Fyers mid-session
+    # rebuilds the feed with the fresh token.
     cfg = load_config()
     watch = list(cfg["watchlist"])
     engine = SignalEngine(watch)
@@ -124,6 +126,52 @@ def trend_chip(label: str, trend) -> str:
 # ----------------------------------------------------------------------------
 cfg_initial = load_config()
 with st.sidebar:
+    st.markdown("### 🔑 Fyers connection")
+    from src.auth import (FyersAuthError, exchange_code_for_token,
+                          extract_auth_code, get_login_url, load_cached_token)
+    from src.config import save_credentials
+
+    if not has_fyers_credentials(cfg_initial):
+        st.caption("Optional — only needed for LIVE real-time data. "
+                   "Replay & delayed modes work without it.")
+        with st.expander("First-time setup: enter your Fyers app keys"):
+            in_app = st.text_input("App ID (looks like AB12345-100)")
+            in_sec = st.text_input("Secret key", type="password")
+            if st.button("💾 Save keys on this computer"):
+                if in_app.strip() and in_sec.strip():
+                    save_credentials(in_app.strip(), in_sec.strip())
+                    st.success("Saved locally (config.yaml — never uploaded anywhere).")
+                    st.rerun()
+                else:
+                    st.error("Please fill in both boxes first.")
+        token_ok = False
+    else:
+        token_ok = load_cached_token() is not None
+        if token_ok:
+            st.success("🟢 Connected to Fyers for today's session")
+        else:
+            st.warning("🔴 Not logged in today (Fyers requires a fresh "
+                       "login every trading day — that's a SEBI rule)")
+            try:
+                st.link_button("Step 1 · Open Fyers login page",
+                               get_login_url(cfg_initial), use_container_width=True)
+            except Exception as e:
+                st.error(f"Could not build login link: {e}")
+            st.caption("After logging in, the browser shows a page that looks "
+                       "broken (https://127.0.0.1/...). That's normal! Copy the "
+                       "WHOLE address from the address bar and paste it below.")
+            pasted = st.text_input("Step 2 · Paste that address here")
+            if st.button("Step 3 · Connect ✅", use_container_width=True):
+                try:
+                    exchange_code_for_token(extract_auth_code(pasted), cfg_initial)
+                    st.success("Connected! Now pick 'live' under Data feed below.")
+                    st.rerun()
+                except FyersAuthError as e:
+                    st.error(str(e))
+                except Exception as e:
+                    st.error(f"Login failed: {e}. Try the login link again — "
+                             "each code works only once and expires fast.")
+
     st.markdown("### ⚙️ Settings")
     mode_options = ["replay", "delayed", "live"]
     mode_help = ("replay = practice session (works anytime) · delayed = free "
@@ -133,6 +181,10 @@ with st.sidebar:
         default_mode = "replay"
     mode = st.radio("Data feed", mode_options,
                     index=mode_options.index(default_mode), help=mode_help)
+    if mode == "live" and not token_ok:
+        st.error("Live mode needs today's Fyers login — use the steps above. "
+                 "Falling back to replay until then.")
+        mode = "replay"
     st.markdown("### 💰 Your risk settings")
     capital = st.number_input("Trading capital (₹)", min_value=1000,
                               value=int(cfg_initial["risk"]["capital"]), step=10000,
@@ -142,7 +194,7 @@ with st.sidebar:
                          help="Common practice: risk only 1-2% of capital on any single trade.")
     st.caption(DISCLAIMER)
 
-engine, feed, journal, cfg, feed_info = boot(mode)
+engine, feed, journal, cfg, feed_info = boot(mode, token_ok)
 
 # ----------------------------------------------------------------------------
 # Header — market status + live index waves
