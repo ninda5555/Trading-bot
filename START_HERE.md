@@ -7,10 +7,17 @@ once; after that, using the app is two double-clicks a day.
 
 ## 🗓️ DAY 1 — one-time setup (15 minutes)
 
-### 1. Install Python (the engine that runs the app)
-- Go to **https://www.python.org/downloads/** and click the yellow button.
-- Run the installer. **On the very first screen, tick the box that says
-  "Add Python to PATH"** — this is the one step people miss.
+### 1. Install Python 3.12 (the engine that runs the app)
+⚠️ **Use Python 3.12 exactly — NOT the newest one.** The newest Python
+(3.13/3.14) is too new for the Fyers broker library; 3.12 runs everything.
+
+- **Windows:** download and run this installer:
+  https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.exe
+- **Mac:** download "macOS 64-bit universal2 installer" from
+  https://www.python.org/downloads/release/python-31210/
+- On the first installer screen, tick **"Add Python to PATH"** if shown,
+  then Install Now. (Already installed a newer Python? No problem — they
+  live side by side; the launcher picks the right one automatically.)
 
 ### 2. Download this app
 - On the GitHub page of this project, click the green **Code** button →
