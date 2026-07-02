@@ -1,0 +1,26 @@
+# Core data stack
+pandas>=2.0
+numpy>=1.24
+
+# Technical indicators
+ta>=0.11
+
+# Free/delayed market data (no broker account needed)
+yfinance>=0.2.40
+
+# Dashboard
+streamlit>=1.35
+plotly>=5.20
+streamlit-autorefresh>=1.0
+
+# Config
+pyyaml>=6.0
+
+# Fyers broker API (live ticks via WebSocket + OAuth)
+fyers-apiv3>=3.1.0
+
+# Time zones (NSE runs on IST)
+pytz>=2024.1
+
+# TOTP for SEBI-mandated 2FA in the daily auth flow
+pyotp>=2.9

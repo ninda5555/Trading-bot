@@ -1,0 +1,43 @@
+# ============================================================
+# NSE Intraday Trading Assistant — configuration
+#
+# COPY this file to `config.yaml` and fill in your values.
+# `config.yaml` is in .gitignore and must NEVER be committed.
+# ============================================================
+
+fyers:
+  # From https://myapi.fyers.in/dashboard — create an App to get these.
+  app_id: "YOUR_APP_ID-100"          # e.g. AB12345-100
+  secret_key: "YOUR_SECRET_KEY"
+  redirect_url: "https://127.0.0.1"  # must EXACTLY match the app's redirect URL
+
+  # Optional: your TOTP secret from Fyers 2FA setup (SEBI-mandated 2FA).
+  # If set, daily re-authentication can be semi-automated.
+  # Leave blank to paste the auth code manually each morning.
+  totp_secret: ""
+
+  # Fyers PIN (used only during automated daily token refresh; optional)
+  pin: ""
+
+risk:
+  capital: 100000          # your trading capital in INR — used for position sizing
+  risk_per_trade_pct: 1.0  # % of capital risked per trade (common practice: 1-2%)
+  daily_loss_limit_pct: 3.0  # warn and stand down if hypothetical day loss hits this
+
+feed:
+  # live    = Fyers WebSocket (needs credentials + market hours)
+  # delayed = free yfinance polling (~1-2 min candles, delayed; no broker needed)
+  # replay  = plays back a recorded/simulated session (practice mode, works anytime)
+  mode: "replay"
+
+watchlist:
+  # Subset of NIFTY50 to watch closely (keep it small while learning).
+  # Full NIFTY50 list lives in src/universe.py
+  - RELIANCE
+  - HDFCBANK
+  - ICICIBANK
+  - INFY
+  - TCS
+  - SBIN
+  - TATAMOTORS
+  - AXISBANK

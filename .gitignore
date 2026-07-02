@@ -1,0 +1,24 @@
+# Credentials & secrets — NEVER commit these
+config.yaml
+*.token
+.tokens/
+
+# Data (downloaded history, journal DB, replay recordings)
+data/
+!data/.gitkeep
+*.db
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Streamlit
+.streamlit/secrets.toml
