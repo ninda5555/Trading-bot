@@ -4,7 +4,7 @@ config.yaml
 .tokens/
 
 # Data (downloaded history, journal DB, replay recordings)
-data/
+data/*
 !data/.gitkeep
 *.db
 
